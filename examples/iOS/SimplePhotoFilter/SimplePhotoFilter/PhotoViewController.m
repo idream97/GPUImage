@@ -24,6 +24,14 @@
 	GPUImageView *primaryView = [[GPUImageView alloc] initWithFrame:mainScreenFrame];
 	primaryView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
+    CGFloat height = (mainScreenFrame.size.width * 4 / 3);
+    CGFloat y = (mainScreenFrame.size.height - height) / 2;
+    
+    imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, y, mainScreenFrame.size.width, height)];
+    imageView.hidden = YES;
+    [primaryView addSubview:imageView];
+
+    
     filterSettingsSlider = [[UISlider alloc] initWithFrame:CGRectMake(25.0, mainScreenFrame.size.height - 50.0, mainScreenFrame.size.width - 50.0, 40.0)];
     [filterSettingsSlider addTarget:self action:@selector(updateSliderValue:) forControlEvents:UIControlEventValueChanged];
 	filterSettingsSlider.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
@@ -41,6 +49,15 @@
     [photoCaptureButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
     
     [primaryView addSubview:photoCaptureButton];
+    
+    resumeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    resumeButton.frame = CGRectMake(0, mainScreenFrame.size.height - 90.0, 100, 40);
+    [resumeButton setTitle:@"Resume" forState:UIControlStateNormal];
+    resumeButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    [resumeButton addTarget:self action:@selector(resume:) forControlEvents:UIControlEventTouchUpInside];
+    [resumeButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
+    
+    [primaryView addSubview:resumeButton];
     
 	self.view = primaryView;	
 }
@@ -68,11 +85,12 @@
 //	[filter prepareForImageCapture];
 //	[terminalFilter prepareForImageCapture];
     
-    [stillCamera addTarget:filter];
+//    [stillCamera addTarget:filter];
     
     GPUImageView *filterView = (GPUImageView *)self.view;
 //    [filter addTarget:filterView];
-    [filter addTarget:filterView];
+//    [filter addTarget:filterView];
+    [stillCamera addTarget:filterView];
 //    [terminalFilter addTarget:filterView];
     
 //    [stillCamera.inputCamera lockForConfiguration:nil];
@@ -107,26 +125,59 @@
 - (IBAction)takePhoto:(id)sender;
 {
     [photoCaptureButton setEnabled:NO];
-    
-    [stillCamera capturePhotoAsJPEGProcessedUpToFilter:filter withCompletionHandler:^(NSData *processedJPEG, NSError *error){
 
-        // Save to assets library
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    [stillCamera capturePhotoAsSampleBufferWithCompletionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
+        NSLog(@"============================== captured sample time : %f", CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(imageSampleBuffer)));
         
-        [library writeImageDataToSavedPhotosAlbum:processedJPEG metadata:stillCamera.currentCaptureMetadata completionBlock:^(NSURL *assetURL, NSError *error2)
-         {
-             if (error2) {
-                 NSLog(@"ERROR: the image failed to be written");
-             }
-             else {
-                 NSLog(@"PHOTO SAVED - assetURL: %@", assetURL);
-             }
-			 
-             runOnMainQueueWithoutDeadlocking(^{
-                 [photoCaptureButton setEnabled:YES];
-             });
-         }];
+        CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(imageSampleBuffer);
+        CGSize sizeOfPhoto = CGSizeMake(CVPixelBufferGetWidth(pixelBuffer), CVPixelBufferGetHeight(pixelBuffer));
+        NSLog(@"APP sampleBuffer size = %f, %f", sizeOfPhoto.width, sizeOfPhoto.height);
+        
+        CIImage* ciImage = [CIImage imageWithCVPixelBuffer:pixelBuffer];
+        
+        CIContext *context = [CIContext contextWithOptions:nil];
+        CGImageRef cgimage = [context createCGImage:ciImage
+                                           fromRect:CGRectMake(0, 0,
+                                                               CVPixelBufferGetWidth(pixelBuffer),
+                                                               CVPixelBufferGetHeight(pixelBuffer))];
+        
+        UIImage *processedImage = [UIImage imageWithCGImage:cgimage scale:1.0f orientation:UIImageOrientationRight];
+        
+
+        imageView.image = processedImage;
+        
+        runOnMainQueueWithoutDeadlocking(^{
+            imageView.hidden = NO;
+            [photoCaptureButton setEnabled:YES];
+        });
+
     }];
+    
+//    [stillCamera capturePhotoAsJPEGProcessedUpToFilter:filter withCompletionHandler:^(NSData *processedJPEG, NSError *error){
+//
+//        // Save to assets library
+//        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+//        
+//        [library writeImageDataToSavedPhotosAlbum:processedJPEG metadata:stillCamera.currentCaptureMetadata completionBlock:^(NSURL *assetURL, NSError *error2)
+//         {
+//             if (error2) {
+//                 NSLog(@"ERROR: the image failed to be written");
+//             }
+//             else {
+//                 NSLog(@"PHOTO SAVED - assetURL: %@", assetURL);
+//             }
+//			 
+//             runOnMainQueueWithoutDeadlocking(^{
+//                 [photoCaptureButton setEnabled:YES];
+//             });
+//         }];
+//    }];
+}
+
+- (IBAction)resume:(id)sender
+{
+    imageView.hidden = YES;
+    [stillCamera resumeCameraCapture];
 }
 
 @end

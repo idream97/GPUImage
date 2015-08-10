@@ -27,6 +27,7 @@
 		BCC1E6DA1523E9DC0006EFA5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCC1E6D91523E9DB0006EFA5 /* AVFoundation.framework */; };
 		BCC9004B18D7D4F100A5A5C7 /* Lambeau.jpg in Resources */ = {isa = PBXBuildFile; fileRef = BCC9004A18D7D4F100A5A5C7 /* Lambeau.jpg */; };
 		BCF867371725A72000912E34 /* libGPUImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCF867321725A70500912E34 /* libGPUImage.a */; };
+		D9A2FE7C1B78A56C008A7E3F /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9A2FE7B1B78A56C008A7E3F /* CoreImage.framework */; };
 		E5066F561855AA1A008C7682 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E5066F551855AA1A008C7682 /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
@@ -80,6 +81,7 @@
 		BCC1E6CF1523E4780006EFA5 /* PhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoViewController.m; sourceTree = "<group>"; };
 		BCC1E6D91523E9DB0006EFA5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		BCC9004A18D7D4F100A5A5C7 /* Lambeau.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = Lambeau.jpg; path = ../../SimpleImageFilter/SimpleImageFilter/Lambeau.jpg; sourceTree = "<group>"; };
+		D9A2FE7B1B78A56C008A7E3F /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		E5066F551855AA1A008C7682 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9A2FE7C1B78A56C008A7E3F /* CoreImage.framework in Frameworks */,
 				BCF867371725A72000912E34 /* libGPUImage.a in Frameworks */,
 				BC6ED8E11545B9A900966798 /* AssetsLibrary.framework in Frameworks */,
 				BCC1E6DA1523E9DC0006EFA5 /* AVFoundation.framework in Frameworks */,
@@ -125,6 +128,7 @@
 		BCC1E69F1523E3620006EFA5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D9A2FE7B1B78A56C008A7E3F /* CoreImage.framework */,
 				BCC1E6B71523E3880006EFA5 /* GPUImage.xcodeproj */,
 				BCC1E6C61523E3C50006EFA5 /* CoreMedia.framework */,
 				BCC1E6C71523E3C50006EFA5 /* CoreVideo.framework */,

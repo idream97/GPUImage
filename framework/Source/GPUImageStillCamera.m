@@ -109,6 +109,8 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
         [videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
     }
     
+    [photoOutput addObserver:self forKeyPath:@"capturingStillImage" options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew context:nil];
+
     [self.captureSession addOutput:photoOutput];
     
     [self.captureSession commitConfiguration];
@@ -133,22 +135,39 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
     [super removeInputsAndOutputs];
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    NSLog(@"observeValueForKeyPath : %@, %@", keyPath, change);
+    
+    if ([keyPath isEqualToString:@"capturingStillImage"])
+    {
+        BOOL isCapturingStillImage = [change[@"new"] boolValue];
+        
+        if ([_captureSession isRunning] && isCapturingStillImage == YES)
+        {
+            NSLog(@"pauseCameraCapture===================================");
+            [self pauseCameraCapture];
+        }
+    }
+}
+
+
 #pragma mark -
 #pragma mark Photography controls
 
 - (void)capturePhotoAsSampleBufferWithCompletionHandler:(void (^)(CMSampleBufferRef imageSampleBuffer, NSError *error))block
 {
-    NSLog(@"If you want to use the method capturePhotoAsSampleBufferWithCompletionHandler:, you must comment out the line in GPUImageStillCamera.m in the method initWithSessionPreset:cameraPosition: which sets the CVPixelBufferPixelFormatTypeKey, as well as uncomment the rest of the method capturePhotoAsSampleBufferWithCompletionHandler:. However, if you do this you cannot use any of the photo capture methods to take a photo if you also supply a filter.");
+//    NSLog(@"If you want to use the method capturePhotoAsSampleBufferWithCompletionHandler:, you must comment out the line in GPUImageStillCamera.m in the method initWithSessionPreset:cameraPosition: which sets the CVPixelBufferPixelFormatTypeKey, as well as uncomment the rest of the method capturePhotoAsSampleBufferWithCompletionHandler:. However, if you do this you cannot use any of the photo capture methods to take a photo if you also supply a filter.");
     
-    /*dispatch_semaphore_wait(frameRenderingSemaphore, DISPATCH_TIME_FOREVER);
+    dispatch_semaphore_wait(frameRenderingSemaphore, DISPATCH_TIME_FOREVER);
     
     [photoOutput captureStillImageAsynchronouslyFromConnection:[[photoOutput connections] objectAtIndex:0] completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
+//        NSLog(@"pauseCameraCapture===================================");
+//        [self pauseCameraCapture];
         block(imageSampleBuffer, error);
     }];
      
-     dispatch_semaphore_signal(frameRenderingSemaphore);
-
-     */
+    dispatch_semaphore_signal(frameRenderingSemaphore);
     
     return;
 }
