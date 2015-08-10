@@ -716,6 +716,8 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     }
 
 	CMTime currentTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    
+//    NSLog(@"processVideoSampleBuffer : %f", CMTimeGetSeconds(currentTime));
 
     [GPUImageContext useImageProcessingContext];
 
@@ -947,6 +949,9 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     }
     else
     {
+//        CMTime currentTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+//        NSLog(@"didOutputSampleBuffer : %f", CMTimeGetSeconds(currentTime));
+        
         if (dispatch_semaphore_wait(frameRenderingSemaphore, DISPATCH_TIME_NOW) != 0)
         {
             return;
@@ -960,6 +965,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
                 [self.delegate willOutputSampleBuffer:sampleBuffer];
             }
             
+//            NSLog(@"runAsynchronouslyOnVideoProcessingQueue : %f", CMTimeGetSeconds(currentTime));
             [self processVideoSampleBuffer:sampleBuffer];
             
             CFRelease(sampleBuffer);
