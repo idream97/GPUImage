@@ -69,7 +69,7 @@
     
     [primaryView addSubview:saveButton];
     
-	self.view = primaryView;	
+	self.view = primaryView;
 }
 
 - (void)viewDidLoad
@@ -221,6 +221,7 @@
 //             });
 //         }];
 //    }];
+
 }
 
 - (IBAction)resume:(id)sender
